@@ -8,6 +8,6 @@ urlpatterns = [
     path('',include("app.urls")),
 ]
 
-# Url Path and Root for MEDIA
+# Url Path and Root for MEDIA files
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
