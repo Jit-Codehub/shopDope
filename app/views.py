@@ -7,9 +7,6 @@ from .models import Cart, Product, Customer, OrderPlaced
 from .forms import CustomerRegistrationForm
 from django.contrib import messages
 
-# def home(request):
-#  return render(request, 'app/home.html')
-
 class ProductView(View):
     def get(self, request):
         topwears = Product.objects.filter(category="TW")
@@ -17,11 +14,6 @@ class ProductView(View):
         mobiles = Product.objects.filter(category="M")
         context = {'topwears':topwears,'bottomwears':bottomwears,'mobiles':mobiles}
         return render(request, 'app/home.html', context)
-
-
-
-# def product_detail(request):
-#  return render(request, 'app/productdetail.html')
 
 class ProductDetailView(View):
     def get(self, request, pk):
@@ -56,12 +48,6 @@ def mobile(request, data=None):
     else:
         mobiles = Product.objects.filter(category="M").filter(brand=data)
     return render(request, 'app/mobile.html', {"mobiles":mobiles})
-
-def login(request):
- return render(request, 'app/login.html')
-
-# def customerregistration(request):
-#  return render(request, 'app/customerregistration.html')
 
 class CustomerRegistrationView(View):
     def get(self, request):
