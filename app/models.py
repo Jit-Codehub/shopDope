@@ -60,7 +60,7 @@ class Cart(models.Model):
 STATUS_CHOICES = (
     ('Accepted','Accepted'),
     ('Packed','Packed'),
-    ('On the way','On The Way'),
+    ('On The Way','On The Way'),
     ('Delivered','Delivered'),
     ('Cancel','Cancel')
 )
@@ -74,6 +74,9 @@ class OrderPlaced(models.Model):
     quantity = models.PositiveBigIntegerField(default=1)
     ordered_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(choices=STATUS_CHOICES, max_length=50, default='Pending')
+
+    def total_cost(self):
+        return self.quantity * self.product.discounted_price
 
 
 
