@@ -1,5 +1,6 @@
 from email import message
 import imp
+import queue
 from unicodedata import category
 from django.shortcuts import render, redirect
 from django.views import View
@@ -7,6 +8,8 @@ from .models import Cart, Product, Customer, OrderPlaced
 from .forms import CustomerProfileForm, CustomerRegistrationForm
 from django.contrib import messages
 from .models import Customer
+from django.http import JsonResponse
+from django.db.models import Q
 
 class ProductView(View):
     def get(self, request):
@@ -32,7 +35,6 @@ def show_cart(request):
     if request.user.is_authenticated:
         user = request.user
         cart = Cart.objects.filter(user=user)
-        print(cart)
         shipping_amount = 70.0
         amount = 0.0
         for p in cart:
@@ -40,12 +42,73 @@ def show_cart(request):
             amount += p.product.discounted_price * p.quantity
         return render(request, 'app/addtocart.html', {'carts':cart, 'total_amount':amount + shipping_amount, "amount":amount})
 
+
+def plus_cart(request):
+    if request.method == 'GET':
+        prod_id = request.GET['prod_id']
+        c = Cart.objects.get(Q(product=prod_id) & Q(user=request.user))
+        c.quantity += 1
+        c.save()
+        cart = Cart.objects.filter(user=request.user)
+        shipping_amount = 70.0
+        amount = 0.0
+        for p in cart:
+            p = Cart.objects.get(id=int(str(p)))
+            amount += p.product.discounted_price * p.quantity
+        data = {
+            'quantity':c.quantity, 
+            'total_amount':amount + shipping_amount, 
+            "amount":amount
+            }
+        return JsonResponse(data)
+
+
+
+def minus_cart(request):
+    if request.method == 'GET':
+        prod_id = request.GET['prod_id']
+        c = Cart.objects.get(Q(product=prod_id) & Q(user=request.user))
+        c.quantity -= 1
+        c.save()
+        cart = Cart.objects.filter(user=request.user)
+        shipping_amount = 70.0
+        amount = 0.0
+        for p in cart:
+            p = Cart.objects.get(id=int(str(p)))
+            amount += p.product.discounted_price * p.quantity
+        data = {
+            'quantity':c.quantity, 
+            'total_amount':amount + shipping_amount, 
+            "amount":amount
+            }
+        return JsonResponse(data)
+
+
+
+
+def remove_cart(request):
+    if request.method == 'GET':
+        prod_id = request.GET['prod_id']
+        c = Cart.objects.get(Q(product=prod_id) & Q(user=request.user))
+        c.delete()
+        cart = Cart.objects.filter(user=request.user)
+        shipping_amount = 70.0
+        amount = 0.0
+        for p in cart:
+            p = Cart.objects.get(id=int(str(p)))
+            amount += p.product.discounted_price * p.quantity
+        data = {
+            'total_amount':amount + shipping_amount, 
+            "amount":amount
+            }
+        return JsonResponse(data)
+
+    
+
+
+
 def buy_now(request):
  return render(request, 'app/buynow.html')
-
-
-
-
 
 def orders(request):
  return render(request, 'app/orders.html')
